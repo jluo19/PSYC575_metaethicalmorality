@@ -124,7 +124,7 @@ data.clean %>%
 
 Repeated-Measure level (Lv 1):
 $$\text{objectivism}_{j,k} = \beta_{j, k} + e_{jk}$$
-Between-cell (Person $\times$ Item) level (Lv 2):
+Person level (Lv 2):
 $$\beta_{0(j, k)} = \gamma_{00} + \beta_{1k}Condition + \beta_{2k}perceived\_agreement + u_{0j} + v_{0k}$$
 Person level (Lv 2a) random slopes
 $$
