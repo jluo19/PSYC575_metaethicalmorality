@@ -125,11 +125,11 @@ data.clean %>%
 Repeated-Measure level (Lv 1):
 $$\text{objectivism}_{j,k} = \beta_{j, k} + e_{jk}$$
 Between-cell (Person $\times$ Item) level (Lv 2):
-$$\beta_{0(j, k)} = \gamma_{00} + \beta_{1j}Condition + \beta_{2k}perceived\_agreement + u_{0j} + v_{0k}$$
+$$\beta_{0(j, k)} = \gamma_{00} + \beta_{1k}Condition + \beta_{2k}perceived\_agreement + u_{0j} + v_{0k}$$
 Person level (Lv 2a) random slopes
 $$
 \begin{aligned}
-  \beta_{1j} = \gamma_{10} + u_{1j}
+  \beta_{1k} = \gamma_{10} + u_{1j}
 \end{aligned}
 $$
 Item level (Lv2b) random slopes
@@ -195,56 +195,12 @@ qqmath(ranef(m1, condVar = FALSE),
 ```
 In the Q-Q plots above, we see the residuals roughly follow the 45-degree line, so normality does not appear to be an issue.
 
+
+
 ##### Summary table
 
 
-
 ![](summary_table.png)
-
-
-```{r echo = FALSE, warning = FALSE}
-
-msummary_mixed <- function(models, output = "default", coef_map = NULL, ...) {
-  if (is.null(coef_map)) {
-    if (!"list" %in% class(models)) {
-      models <- list(models)
-    }
-    for (model in models) {
-      coef_map <- union(coef_map, tidy(model)$term)
-    }
-    ranef_index <- grep("^(sd|cor)__", x = coef_map)
-    coef_map <- c(coef_map[-ranef_index], coef_map[ranef_index])
-    names(coef_map) <- coef_map
-  } else {
-    ranef_index <- grep("^(sd|cor)__", x = names(coef_map))
-  }
-  rows <- data.frame(term = c("Fixed Effects", "Random Effects"))
-  rows <- cbind(rows, rbind(
-    rep("", length(models)),
-    rep("", length(models))
-  ))
-  length_fes <- length(coef_map) - length(ranef_index)
-  if ("statistic" %in% names(list(...)) && is.null(list(...)$statistic)) {
-    attr(rows, "position") <- c(1, (length_fes + 1))
-  } else {
-    attr(rows, "position") <- c(1, (length_fes + 1) * 2)
-  }
-  if (output == "latex" || knitr::is_latex_output()) {
-    coef_map <- gsub("_", "-", coef_map)
-  }
-  modelsummary::msummary(models,
-    output = output, coef_map = coef_map,
-    add_rows = rows, ...
-  )
-}
-
-```
-
-
-```{r include=FALSE}
-msummary_mixed(list("random-intercept" = m0,
-                    "model 1" = m1))
-```
 
 ##### Testing random slopes
 
@@ -267,8 +223,32 @@ ranova(m1.rs2)
 
 Neither the random slopes for `Condition` nor 'perceived_agreement' were significant.
 
+##### Plots
 
+```{R}
+plot_model(m1,
+    type = "pred", terms = "Condition",
+    show.data = TRUE, jitter = 0.1,
+    title = "", dot.size = 0.8
+)
 
+plot_model(m1,
+    type = "pred", terms = "perceived_agreement",
+    show.data = TRUE, jitter = 0.1,
+    title = "", dot.size = 0.8
+)
+
+interact_plot(m1,
+              pred = "perceived_agreement",
+              modx = "Condition",
+              plot.points = TRUE,
+              point.size = 0.5,
+              point.alpha = 0.2,
+              x.label = "Perceived Agreement with Target",
+              y.label = "Objectivism Rating",
+              jitter = 0.1
+)
+```
 
 ##### Summary
 
